@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.mail import send_mail
 
-from mailing.models import Mailing, Log
+from mailing.models import Mailing, MailingLog
 from datetime import datetime, timedelta
 
 current_datetime = datetime.now()
@@ -34,10 +34,10 @@ def start_mailing():
                 elif mailing.period == 'one_time':
                     mailing.status = 'completed'
                 mailing.save()
-                Log.objects.create(attempt_status='success', response='Email sent successfully', mailing=mailing)
+                MailingLog.objects.create(attempt_status='success', response='Email sent successfully', mailing=mailing)
 
             except Exception as e:
-                Log.objects.create(attempt_status='error', response=str(e))
+                MailingLog.objects.create(attempt_status='error', response=str(e))
 
 
 def my_write_text():

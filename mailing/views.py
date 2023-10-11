@@ -2,8 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from pytils.translit import slugify
-from mailing.models import Client, Mailing, Message, Log
-
+from mailing.models import Client, Mailing, Message, MailingLog
 
 
 def index(request):
@@ -121,12 +120,12 @@ class MailingDeleteView(DeleteView):
     success_url = reverse_lazy('mailing:mailings')
 
 
-class LogListView(ListView):
-    model = Log
-    template_name = 'catalog/log_list.html'
+class MailingLogListView(ListView):
+    model = MailingLog
+
 
     def get_queryset(self):
-        queryset = Log.objects.all()
+        queryset = MailingLog.objects.all()
        # if self.request.user.is_staff:
        #     return Log.objects.all()
        # queryset = Log.objects.filter(mailing__user = self.request.user)
@@ -147,6 +146,3 @@ def activate_mailing(request, pk):
 #     my_scheduled_print()
 
 
-# def active_mailing(request, pk):
-#     send_mailing(mailing_id=pk)
-#     return redirect(reverse('mailing:mailings'))

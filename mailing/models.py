@@ -77,7 +77,7 @@ class Mailing(models.Model):
         verbose_name_plural = 'рассылки'
 
 
-class Log(models.Model):
+class MailingLog(models.Model):
     mailing = models.ForeignKey(Mailing, on_delete=models.CASCADE, verbose_name='рассылка')
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name='время')
     status = models.CharField(max_length=20, verbose_name='статус')

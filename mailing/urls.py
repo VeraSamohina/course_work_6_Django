@@ -4,7 +4,7 @@ from mailing.apps import MailingConfig
 from mailing.views import (ClientListView, ClientCreateView, ClientUpdateView, ClientDeleteView, index,
                            MessageCreateView, MessageUpdateView, MessageDeleteView, MessageListView, MailingListView,
                            MailingCreateView, MailingDeleteView, MailingUpdateView, activate_mailing,
-                           LogListView)
+                           MailingLogListView)
 
 app_name = MailingConfig.name
 
@@ -27,6 +27,6 @@ urlpatterns = [
     path('mailings/start/<int:pk>/', activate_mailing, name='start'),
     # path('mailings/test/', test_cron, name='test_cron'),
 
-    path('mailings/logs/', LogListView.as_view(), name='logs'),
+    path('mailings/logs/', MailingLogListView.as_view(), name='logs'),
 
 ]
