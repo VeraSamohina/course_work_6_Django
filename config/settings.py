@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     'mailing',
     'django_crontab',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -145,3 +146,7 @@ CRONJOBS = [
     ('*/5 * * * *', 'myapp.cron.my_write_text', '>> /tmp/my_write_text.log')
 ]
 
+AUTH_USER_MODEL = 'users.User'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/users/'
