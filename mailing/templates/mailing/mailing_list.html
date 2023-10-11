@@ -1,0 +1,39 @@
+{% extends 'mailing/base.html' %}
+{% block content %}
+<main class="container">
+    {% for object in object_list %}
+    <div class="card border-info mb-5" style="">
+        <div class="row g-0">
+            <div class="col-md-12">
+  <div class="card-body">
+    <h5 class="card-title">{{object.title}}</h5>
+    <p class="card-text">{{object.message | truncatechars:15}}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Начало рассылки: {{object.start_time}}</li>
+    <li class="list-group-item">Конец рассылки: {{object.end_time}}</li>
+    <li class="list-group-item">Периодичность рассылки: {{object.period}}</li>
+      <li class="list-group-item">Получатели: {% for client in object.clients.all %} {{ client.email }},
+          {% endfor %}</li>
+      <li class="list-group-item">Статус: {{object.status}}</li>
+  </ul>
+  <div class="card-body">
+    <a href="{% url 'mailing:edit' object.slug %}" class="card-link">Редактировать</a>
+    <a href="{% url 'mailing:delete' object.slug %}" class="card-link">Удалить</a>
+      {% if object.status == 'active' %}
+     <a href="{% url 'mailing:start' object.pk %}" class="card-link">Остановить</a>
+      {% else %}
+      <a href="{% url 'mailing:start' object.pk %}" class="card-link">Запустить</a>
+      {% endif %}
+  </div>
+</div>
+
+            </div>
+        </div>
+
+    {% endfor %}
+    <a class="btn btn-outline-info" href="{% url 'mailing:create' %}"> Добавить новую рассылку</a>
+    <a class="btn btn-outline-info" href="{% url 'mailing:messages' %}"> Посмотреть сообщения для рассылки</a>
+
+</main>
+{% endblock %}

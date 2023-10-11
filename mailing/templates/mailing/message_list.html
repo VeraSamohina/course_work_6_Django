@@ -1,0 +1,23 @@
+{% extends 'mailing/base.html' %}
+{% block content %}
+<main class="container">
+    {% for object in object_list %}
+    <div class="card border-info mb-5" style="">
+        <div class="row g-0">
+            <div class="col-md-12">
+                <div class="card-body">
+                    <h5 class="card-title">{{object.title}}</h5>
+                    <p class="card-text">{{object.body|truncatewords:20}}-....</p>
+
+                </div>
+                <div class="card-footer">
+                <a href="{% url 'mailing:edit_message' object.slug %}" class="btn btn-outline-success btn-sm mb-2 md-end">Редактировать</a>
+                <a href="{% url 'mailing:delete_message' object.slug %}" class="btn btn-outline-danger btn-sm mb-2">Удалить</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <a class="btn btn-outline-info" href="{% url 'mailing:create_message' %}"> Добавить новую статью</a>
+</main>
+{% endblock %}

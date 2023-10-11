@@ -1,0 +1,47 @@
+{% extends 'mailing/base.html' %}
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header text-center">
+                   Получатели рассылок для ...
+                </div>
+                <div class="card-body">
+                    <table class ="table table-stripped table-hover">
+                        <thead>
+                        <tr>
+                        <th>#</th>
+                        <th>ФИО</th>
+                        <th>email</th>
+                        <th>Дата рождения</th>
+                        <th>Комментарий</th>
+                        <th>--</th>
+                        <th></th>
+                        </tr>
+                        </thead>
+                        {% for object in object_list %}
+                        <tbody>
+                        <tr>
+                        <th scope="row">{{object.pk}}</th>
+                        <td>{{object.fullname}}</td>
+                        <td>{{object.email}}</td>
+                         <td> {% if object.birth_day %} {{ object.birth_day }} {% else %} Не указано {% endif %}</td>
+                        <td>{{object.comments}}</td>
+                        <td><p><a href="{% url 'mailing:edit_client' object.slug %}"><i class="fa-solid fa-pen"></i></a></p> </td>
+                        <td><a href="{% url 'mailing:delete_client' object.slug %}">
+                            <i class="fa-solid fa-trash" style="color: #dc3545"></i>
+                        </a></td>
+                        </tbody>
+                        {% endfor %}
+
+
+
+                    </table>
+
+                        <a href="{% url 'mailing:create_client' %}" class="btn btn-outline-primary w-100">Добавить получателя</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
