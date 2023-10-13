@@ -2,11 +2,11 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            <div class="card border-purple mb-3">
                 <div class="card-header text-center">
                    Получатели рассылок для ...
                 </div>
-                <div class="card-body">
+                <div class="card-body ">
                     <table class ="table table-stripped table-hover">
                         <thead>
                         <tr>
@@ -38,7 +38,7 @@
 
                     </table>
 
-                        <a href="{% url 'mailing:create_client' %}" class="btn btn-outline-primary w-100">Добавить получателя</a>
+                        <a href="{% url 'mailing:create_client' %}" class="btn btn-outline-orange w-100">Добавить получателя</a>
 
                 </div>
             </div>

@@ -1,23 +1,29 @@
 {% extends 'mailing/base.html' %}
 {% block content %}
-<main class="container">
+<div class="container">
+<div class="row">
+    <div class="d-grid col-6 mx-auto">
+        <a class="btn btn-outline-orange btn-lg w-100" href="{% url 'mailing:create' %}">Новая рассылка</a>
+</div>
+</div>
+  <div class="row row-cols-2 row-cols-md-2 g-4 mt-5">
     {% for object in object_list %}
-    <div class="card border-info mb-5" style="">
-        <div class="row g-0">
-            <div class="col-md-12">
+    <div class="col-5">
+    <div class="card border-purple mb-5 ">
+        <div class="card-header text-center">
+            <h5 class="my-0 fw-normal">{{object.title}}</h5>
+        </div>
   <div class="card-body">
-    <h5 class="card-title">{{object.title}}</h5>
-    <p class="card-text">{{object.message | truncatechars:15}}</p>
-  </div>
   <ul class="list-group list-group-flush">
+      <li class="list-group-item" >Текст рассылки:  {{object.message | truncatechars:15}}</li>
     <li class="list-group-item">Начало рассылки: {{object.start_time}}</li>
     <li class="list-group-item">Конец рассылки: {{object.end_time}}</li>
     <li class="list-group-item">Периодичность рассылки: {{object.period}}</li>
-      <li class="list-group-item">Получатели: {% for client in object.clients.all %} {{ client.email }},
-          {% endfor %}</li>
+      <li class="list-group-item">Получатели: {% for client in object.clients.all %} {{ client.email }} {% endfor %}</li>
       <li class="list-group-item">Статус: {{object.status}}</li>
   </ul>
-  <div class="card-body">
+</div>
+  <div class="card-footer">
     <a href="{% url 'mailing:edit' object.slug %}" class="card-link">Редактировать</a>
     <a href="{% url 'mailing:delete' object.slug %}" class="card-link">Удалить</a>
       {% if object.status == 'active' %}
@@ -25,15 +31,17 @@
       {% else %}
       <a href="{% url 'mailing:start' object.pk %}" class="card-link">Запустить</a>
       {% endif %}
-  </div>
-</div>
 
+
+</div>
+        </div>
+        </div>
+      <div class="col-1"></div>
+      {% endfor %}
             </div>
         </div>
 
-    {% endfor %}
-    <a class="btn btn-outline-info" href="{% url 'mailing:create' %}"> Добавить новую рассылку</a>
     <a class="btn btn-outline-info" href="{% url 'mailing:messages' %}"> Посмотреть сообщения для рассылки</a>
 
-</main>
+
 {% endblock %}

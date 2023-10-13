@@ -1,46 +1,18 @@
 {% load static %}
 <!doctype html>
 <html lang="en">
-    <head><script src="{% static 'js/color-modes.js' %}"></script>
+    <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
 
     <title>Сервис рассылок "Пульс"</title>
-
-        <script src="https://kit.fontawesome.com/d08a35466a.js" crossorigin="anonymous"></script>
-
+        <link rel="shortcut icon" href="{% static 'img/faviconemail.ico' %}" type="image/x-icon">
     <!-- Bootstrap core CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <link href="{% static 'css/style.css' %}" rel="stylesheet">
 
-<style>
-/* CSS */
-.img__container {
-  position: relative;
-  margin: 20px auto 30px auto;
-}
-
-.img__container>img {
-  display: inline-block;
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
-  box-shadow: 0 0 6px #9E9E9E;
-  border: 4px solid #fff;
-}
-
-.img__description {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 30px;
-
-}
-
-
-</style>
     <!-- Custom styles for this template -->
     <link href="{% static 'css/headers.css' %}" rel="stylesheet">
   </head>
@@ -48,22 +20,23 @@
     <header class="p-3 mb-3 border-bottom">
     <div class="container">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a class="navbar-brand" href="{% url 'mailing:index' %}">ПУЛЬС</a>
+        <a class="navbar-brand orange" href="{% url 'mailing:index' %}">
+      <img src="{% static 'img/email_.svg' %}" alt="" width="30" height="24" class="d-inline-block align-text-top">
+      ПУЛЬС</a>
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-          <li><a href="{% url 'mailing:clients' %}" class="nav-link px-2 link-secondary">Получатели</a></li>
-          <li><a href="{% url 'mailing:mailings' %}" class="nav-link px-2 link-body-emphasis">Рассылки</a></li>
-          <li><a href="{% url 'mailing:logs' %}" class="nav-link px-2 link-body-emphasis">Статистика</a></li>
-          <li><a href="#" class="nav-link px-2 link-body-emphasis">Прочее</a></li>
+          <li><a href="{% url 'mailing:clients' %}" class="nav-link px-2  purple">Получатели</a></li>
+          <li><a href="{% url 'mailing:mailings' %}" class="nav-link px-2  purple">Рассылки</a></li>
+          <li><a href="{% url 'mailing:logs' %}" class="nav-link px-2 purple">Статистика</a></li>
+          <li><a href="#" class="nav-link px-2 purple">Блог</a></li>
 
-
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown ">
                     {% if user.is_authenticated %}
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                    <a class="nav-link dropdown-toggle orange" href="#" id="navbarDropdown" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-user-circle"></i>
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <ul class="dropdown-menu orange"  aria-labelledby="navbarDropdown">
                         <li>
                             <a class="dropdown-item" href="#">Новая рассылка</a>
                         </li>
@@ -72,7 +45,6 @@
                         {% if user.is_superuser or user.staff %}
                         <li><a class="dropdown-item" href="{% url 'admin:index' %}">Админ-панель</a></li>
                         {% endif %}
-
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -82,13 +54,17 @@
                             </a>
                         </li>
                     </ul>
+                    <li class="nav-item">
+            <small class="text gray  ml-5">Вы вошли как {{user.email}}</small>
+        </li>
+
                     {% else %}
                     <li class="nav-item">
-                    <a class="nav-link" href="{% url 'users:login' %}">Войти <i class="fas fa-sign-in-alt"></i></a>
+                    <a class="nav-link px-2  purple" href="{% url 'users:login' %}">Войти <i class="fas fa-sign-in-alt"></i></a>
                 </li>
 
             <li class="nav-item">
-                    <a class="nav-link" href="{% url 'users:register' %}">Зарегистрироваться <i class="fa-regular fa-user"></i></a>
+                    <a class="nav-link px-2  purple" href="{% url 'users:register' %}">Зарегистрироваться <i class="fa-regular fa-user"></i></a>
                 </li>
     {% endif %}
         </ul>
@@ -96,9 +72,8 @@
     </div>
  </header>
 
-<main role="main">
+<body>
 
-    <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="img__container">
 
         <img src="{% static 'img/mini.jpg' %}" class="img " alt="фон">
@@ -118,7 +93,7 @@
 
     <hr/>
 
-
+</body>
 <footer class="container">
     <p>&copy; Cервис управления рассылками "Пульс" 2023</p>
 </footer>
@@ -126,15 +101,12 @@
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-        crossorigin="anonymous"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"-->
+<!--        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"-->
+<!--        crossorigin="anonymous"></script>-->
 
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
-<script src="{% static 'js/fontawesome-icons.js' %}" crossorigin="anonymous"></script>
-</main>
+<script src="{% static 'js/all.min.js' %}"></script>
+<script src="{% static 'js/color-modes.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}" ></script>
 </html>

@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from pytils.translit import slugify
+
+from mailing.forms import MailingForm, MessageForm
 from mailing.models import Client, Mailing, Message, MailingLog
 
 
@@ -62,7 +64,7 @@ class MailingListView(ListView):
 
 class MessageCreateView(CreateView):
     model = Message
-    fields = ('title', 'body')
+    form_class = MessageForm
     extra_context = {
         'title': 'Создание рассылки'
     }
@@ -73,8 +75,8 @@ class MessageUpdateView(UpdateView):
     extra_context = {
         'title': 'Редактирование рассылки'
     }
+    form_class = MessageForm
     model = Message
-    fields = ('title', 'body', 'slug')
     success_url = reverse_lazy('mailing:messages')
 
 
@@ -96,7 +98,7 @@ class MessageListView(ListView):
 
 class MailingCreateView(CreateView):
     model = Mailing
-    fields = ('title', 'start_time', 'end_time', 'message', 'period', 'status', 'clients')
+    form_class = MailingForm
     success_url = reverse_lazy('mailing:mailings')
     extra_context = {
         'title': 'Создать новую рассылку'
@@ -108,7 +110,7 @@ class MailingUpdateView(UpdateView):
         'title': 'Редактирование рассылки'
     }
     model = Mailing
-    fields = ('title', 'start_time', 'end_time', 'message', 'period', 'status', 'clients')
+    form_class = MailingForm
     success_url = reverse_lazy('mailing:mailings')
 
 
