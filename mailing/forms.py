@@ -1,6 +1,6 @@
 from django import forms
 
-from mailing.models import Mailing, Message
+from mailing.models import Mailing, Message, Client
 
 
 class StyleFormMixin:
@@ -11,19 +11,28 @@ class StyleFormMixin:
 
 
 class MailingForm(StyleFormMixin, forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        owner = kwargs.pop('owner', None)
+        super(MailingForm, self).__init__(*args, **kwargs)
+        self.fields['clients'].queryset = Client.objects.filter(owner=owner)
+        self.fields['message'].queryset = Message.objects.filter(owner=owner)
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
     class Meta:
         model = Mailing
-        exclude = ('slug',)
-
-    # widgets = {
-    #     'title': forms.TextInput(attrs={'class': 'form-control'}),
-    #     'period': forms.TextInput(attrs={'class': 'form-control'}),
-    #     'start_time': forms.TextInput(attrs={'class': 'form-control'}),
-    # }
+        exclude = ('slug', 'owner', 'is_active')
 
 
 class MessageForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Message
-        exclude = ('slug',)
+        exclude = ('slug', 'owner')
+
+
+class ClientForm(StyleFormMixin, forms.ModelForm):
+    class Meta:
+        model = Client
+        exclude = ('slug', 'owner')
