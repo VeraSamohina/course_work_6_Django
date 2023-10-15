@@ -41,8 +41,10 @@
                         {% if user.is_superuser or request.user|has_group:'moderator' %}
                             <td>{{object.owner}}</td>
                             {% endif %}
-                            {% if user.is_superuser or request.user|has_group:'moderator' %}
+                            {% if object.owner == request.user %}
                         <td><p><a href="{% url 'mailing:edit_client' object.slug %}"><i class="fa-solid fa-pen"></i></a></p> </td>
+                            {% endif %}
+                            {% if user.is_superuser or object.owner == request.user %}
                             <td><a href="{% url 'mailing:delete_client' object.slug %}">
                             <i class="fa-solid fa-trash" style="color: #dc3545"></i>
                         </a></td>

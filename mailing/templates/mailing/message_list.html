@@ -22,12 +22,14 @@
             {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{object.title}}</h5>
-                    <p class="card-text">{{object.body|truncatewords:20}}-....</p>
+                    <p class="card-text">{{object.body}}</p>
                 </div>
                 <div class="card-footer">
-                    {% if not request.user|has_group:'moderator' or object.owner == request.user %}
+                    {% if object.owner == request.user %}
                 <a href="{% url 'mailing:edit_message' object.slug %}" class="btn btn-outline-success btn-sm mb-2 md-end">Редактировать</a>
-                <a href="{% url 'mailing:delete_message' object.slug %}" class="btn btn-outline-danger btn-sm mb-2">Удалить</a>
+                {% endif %}
+                    {% if user.is_superuser or object.owner == request.user %}
+                    <a href="{% url 'mailing:delete_message' object.slug %}" class="btn btn-outline-danger btn-sm mb-2">Удалить</a>
                 {% endif %}
                 </div>
             </div>

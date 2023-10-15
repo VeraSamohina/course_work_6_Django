@@ -28,7 +28,7 @@
           <li><a href="{% url 'mailing:clients' %}" class="nav-link px-2  purple">Получатели</a></li>
           <li><a href="{% url 'mailing:mailings' %}" class="nav-link px-2  purple">Рассылки</a></li>
           <li><a href="{% url 'mailing:logs' %}" class="nav-link px-2 purple">Статистика</a></li>
-          <li><a href="#" class="nav-link px-2 purple">Блог</a></li>
+          <li><a href="{% url 'blog:articles' %}" class="nav-link px-2 purple">Блог</a></li>
 
                 <li class="nav-item dropdown ">
                     {% if user.is_authenticated %}

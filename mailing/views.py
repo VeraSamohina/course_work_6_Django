@@ -134,7 +134,6 @@ class MailingDeleteView(LoginRequiredMixin,  DeleteView):
             raise Http404
 
 
-
 class MessageCreateView(LoginRequiredMixin, CreateView):
     model = Message
     form_class = MessageForm

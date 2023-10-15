@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'mailing',
     'django_crontab',
     'users',
+    'blog',
 ]
 
 MIDDLEWARE = [
