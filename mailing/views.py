@@ -1,5 +1,5 @@
-from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import  LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
@@ -10,7 +10,7 @@ from mailing.models import Client, Mailing, Message, MailingLog
 
 
 def index(request):
-    context = {'title': 'Сервис управления рассылками'}
+    context = {'title': 'Главная'}
     return render(request, 'mailing/index.html', context,)
 
 
@@ -117,7 +117,7 @@ class MailingUpdateView(LoginRequiredMixin,  UpdateView):
         self.object = super().get_object()
         user_groups = [group.name for group in self.request.user.groups.all()]
         if self.object.owner != self.request.user or 'moderator' in user_groups:
-           raise Http404
+            raise Http404
         return self.object
 
 
@@ -145,8 +145,6 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
         self.object.owner = self.request.user
         self.object.save()
         return super().form_valid(form)
-
-
 
 
 class MessageUpdateView(LoginRequiredMixin,  UpdateView):
@@ -207,23 +205,28 @@ class MailingLogListView(ListView):
 @login_required
 def start_mailing(request, pk):
     mailing_item = get_object_or_404(Mailing, pk=pk)
-    if mailing_item.is_active:
-        if mailing_item.status == 'started':
-            mailing_item.status = 'created'
-        elif mailing_item.status == 'created':
-            mailing_item.status = 'started'
-        mailing_item.save()
-    return redirect(reverse('mailing:mailings'))
+    if request.user == mailing_item.owner:
+        if mailing_item.is_active:
+            if mailing_item.status == 'started':
+                mailing_item.status = 'created'
+            elif mailing_item.status == 'created':
+                mailing_item.status = 'started'
+            mailing_item.save()
+        return redirect(reverse('mailing:mailings'))
+    else:
+        return HttpResponseForbidden('Недостаточно прав для совершения операции')
 
 
 @login_required
 def deactivate_mailing(request, pk):
     mailing_item = get_object_or_404(Mailing, pk=pk)
-    if mailing_item.is_active:
-        mailing_item.is_active = False
+    user_groups = [group.name for group in request.user.groups.all()]
+    if request.user.is_superuser or 'moderator' in user_groups:
+        if mailing_item.is_active:
+            mailing_item.is_active = False
+        else:
+            mailing_item.is_active = True
+        mailing_item.save()
+        return redirect(reverse('mailing:mailings'))
     else:
-        mailing_item.is_active = True
-    mailing_item.save()
-    return redirect(reverse('mailing:mailings'))
-
-
+        return HttpResponseForbidden('Недостаточно прав для совершения операции')

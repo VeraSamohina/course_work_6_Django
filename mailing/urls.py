@@ -28,5 +28,6 @@ urlpatterns = [
     path('mailings/deactivate/<int:pk>', deactivate_mailing, name='deactivate'),
 
     path('mailings/logs/', MailingLogListView.as_view(), name='logs'),
+    #path('mailings/test/', my_write_text, name='test'),
 
 ]

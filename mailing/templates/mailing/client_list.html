@@ -34,9 +34,9 @@
                         <tbody>
                         <tr>
                         <th scope="row">{{object.pk}}</th>
-                        <td>{{object.fullname}}</td>
+                        <td>{{object.fullname | default:"не указана"}}</td>
                         <td>{{object.email}}</td>
-                         <td> {% if object.birth_day %} {{ object.birth_day }} {% else %} Не указано {% endif %}</td>
+                         <td> {{ object.birth_day | default:"не указан"}} </td>
                         <td>{{object.comments}}</td>
                         {% if user.is_superuser or request.user|has_group:'moderator' %}
                             <td>{{object.owner}}</td>

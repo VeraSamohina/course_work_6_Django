@@ -1,10 +1,20 @@
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView, TemplateView
+from django.http import HttpResponseForbidden
+from django.shortcuts import redirect
+from django.urls import reverse_lazy, reverse
+from django.views.generic import CreateView, UpdateView, TemplateView, ListView
 
-from users.forms import UserRegisterForm, UserForm
+from users.forms import UserRegisterForm, UserForm, UserLoginForm
 from users.models import User
+
+
+class UserLoginView(LoginView):
+    model = User
+    form_class = UserLoginForm
+    success_url = reverse_lazy('mailing:index')
 
 
 class RegisterView(CreateView):
@@ -47,3 +57,27 @@ class UserUpdateView(UpdateView):
 
     def get_object(self, queryset=None):
         return self.request.user
+
+
+class UserListView(PermissionRequiredMixin, ListView):
+    model = User
+    extra_context = {'title': 'Пользователи сервиса'}
+    permission_required = []
+
+    def has_permission(self):
+        if self.request.user.groups.filter(name='moderator').exists():
+            return super().has_permission()
+
+
+def toggle_users_status(request, pk):
+    user_groups = [group.name for group in request.user.groups.all()]
+    if request.user.is_superuser or 'moderator' in user_groups:
+        user = User.objects.get(pk=pk)
+        if user.is_active:
+            user.is_active = False
+        else:
+            user.is_active = True
+        user.save()
+        return redirect(reverse('users:users'))
+    else:
+        return HttpResponseForbidden('Недостаточно прав для совершения операции')
