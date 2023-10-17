@@ -31,15 +31,20 @@
                         <li class="list-group-item">Периодичность рассылки: {{object.period}}</li>
                         <li class="list-group-item">Получатели: {% for client in object.clients.all %} {{ client.email}} {% endfor %}
                         </li>
-                        <li class="list-group-item">Состояние: {{object.status}}</li>
+                       {% if object.status == 'started' %}
+                        <li class="list-group-item text-success">
+                            {% elif object.status == 'created' %}
+                            <li class="list-group-item orange">
+                        {% else %}
+                            <li class="list-group-item text-secondary">
+                        {% endif %}
+                        Состояние: {{object.status}}</li>
                     </ul>
                 </div>
                 <div class="card-footer">
 
                     {% if object.owner == request.user %}
                     <a href="{% url 'mailing:edit' object.slug %}" class="card-link">Редактировать</a>
-                    {% endif %}
-                    {% if user.is_superuser or object.owner == request.user %}
                     <a href="{% url 'mailing:delete' object.slug %}" class="card-link">Удалить</a>
                     {% if object.is_active %}
                     {% if object.status == 'started' %}

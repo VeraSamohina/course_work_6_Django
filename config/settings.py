@@ -40,9 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'mailing',
-    'django_crontab',
     'users',
     'blog',
+    'django_apscheduler',
 ]
 
 MIDDLEWARE = [
@@ -142,12 +142,11 @@ EMAIL_HOST_USER = 'samohinavera@yandex.ru'
 EMAIL_HOST_PASSWORD = os.environ.get('YANDEXPAS')
 EMAIL_USE_SSL = True
 
-CRONJOBS = [
-    ('*/5 * * * *', 'myapp.cron.start_mailing'),
-    ('*/5 * * * *', 'myapp.cron.my_write_text', '>> /tmp/my_write_text.log')
-]
 
 AUTH_USER_MODEL = 'users.User'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/users/'
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+APSCHEDULER_RUN_NOW_TIMEOUT = 25
