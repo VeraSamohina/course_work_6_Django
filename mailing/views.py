@@ -1,17 +1,38 @@
+from random import sample
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponseForbidden
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
 
+from blog.models import Article
 from mailing.forms import MailingForm, MessageForm, ClientForm
 from mailing.models import Client, Mailing, Message, MailingLog
+from users.models import User
 
 
-def index(request):
-    context = {'title': 'Главная'}
-    return render(request, 'mailing/index.html', context,)
+class HomeView(TemplateView):
+    extra_context = context = {'title': 'Главная'}
+    template_name = 'mailing/index.html'
+
+    def get_context_data(self, **kwargs):
+        """Получаем общую context_data для всех пользователей и конкретную для авторизованного"""
+        context_data = super().get_context_data(**kwargs)
+        context_data['count_mailing'] = Mailing.objects.all().count()
+        context_data['count_active_mailing'] = Mailing.objects.filter(status__in=['created', 'started']).count()
+        context_data['count_unique_clients'] = Client.objects.all().distinct().count()
+        articles = list(Article.objects.all())
+        context_data['random_articles'] = sample(articles, min(3, len(articles)))
+        context_data['count_users'] = User.objects.filter(is_active=True, is_staff=False).count()
+        user = self.request.user
+        if user.is_authenticated:
+            context_data['user_count_active_mailing'] = Mailing.objects.filter(status__in=['created', 'started'],
+                                                                               owner=user).count()
+            context_data['user_count_clients'] = Client.objects.filter(owner=user).count()
+            context_data['user_count_messages'] = Message.objects.filter(owner=user).count()
+        return context_data
 
 
 class ClientListView (ListView):
@@ -36,6 +57,7 @@ class ClientCreateView(LoginRequiredMixin,  CreateView):
     success_url = reverse_lazy('mailing:clients')
 
     def form_valid(self, form):
+        """Присвоение при создании клиента полю 'owner' значения текущего пользователя"""
         if form.is_valid():
             form.instance.owner = self.request.user
             form.save()
@@ -49,11 +71,12 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('mailing:clients')
 
     def get_object(self, queryset=None):
+        """Разрешаем редактирование клиента только пользователю, его создавшему"""
         self.object = super().get_object()
-        user_groups = [group.name for group in self.request.user.groups.all()]
-        if self.object.owner != self.request.user or 'moderator' in user_groups:
+        if self.object.owner == self.request.user:
+            return self.object
+        else:
             raise Http404
-        return self.object
 
 
 class ClientDeleteView(LoginRequiredMixin, DeleteView):
@@ -62,8 +85,9 @@ class ClientDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('mailing:clients')
 
     def get_object(self, queryset=None):
+        """Разрешаем удаление клиента только пользователю, его создавшему"""
         self.object = super().get_object()
-        if self.object.owner == self.request.user or self.request.user.is_superuser:
+        if self.object.owner == self.request.user:
             return self.object
         else:
             raise Http404
@@ -96,6 +120,7 @@ class MailingCreateView(LoginRequiredMixin,  CreateView):
         return kwargs
 
     def form_valid(self, form):
+        """Присвоение при создании рассылки полю 'owner' значения текущего пользователя"""
         if form.is_valid():
             form.instance.owner = self.request.user
             form.save()
@@ -114,11 +139,12 @@ class MailingUpdateView(LoginRequiredMixin,  UpdateView):
         return kwargs
 
     def get_object(self, queryset=None):
+        """Разрешаем редактирование рассылки только пользователю, его создавшему"""
         self.object = super().get_object()
-        user_groups = [group.name for group in self.request.user.groups.all()]
-        if self.object.owner != self.request.user or 'moderator' in user_groups:
+        if self.object.owner == self.request.user:
+            return self.object
+        else:
             raise Http404
-        return self.object
 
 
 class MailingDeleteView(LoginRequiredMixin,  DeleteView):
@@ -127,8 +153,9 @@ class MailingDeleteView(LoginRequiredMixin,  DeleteView):
     success_url = reverse_lazy('mailing:mailings')
 
     def get_object(self, queryset=None):
+        """Разрешаем удаление рассылки только пользователю, его создавшему"""
         self.object = super().get_object()
-        if self.object.owner == self.request.user or self.request.user.is_superuser:
+        if self.object.owner == self.request.user:
             return self.object
         else:
             raise Http404
@@ -141,6 +168,7 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('mailing:messages')
 
     def form_valid(self, form):
+        """Присвоение при создании сообщения полю 'owner' значения текущего пользователя"""
         self.object = form.save()
         self.object.owner = self.request.user
         self.object.save()
@@ -156,11 +184,12 @@ class MessageUpdateView(LoginRequiredMixin,  UpdateView):
     success_url = reverse_lazy('mailing:messages')
 
     def get_object(self, queryset=None):
+        """Разрешаем редактирование сообщения только пользователю, его создавшему"""
         self.object = super().get_object()
-        user_groups = [group.name for group in self.request.user.groups.all()]
-        if self.object.owner != self.request.user or 'moderator' in user_groups:
+        if self.object.owner == self.request.user:
+            return self.object
+        else:
             raise Http404
-        return self.object
 
 
 class MessageDeleteView(LoginRequiredMixin,  DeleteView):
@@ -169,8 +198,9 @@ class MessageDeleteView(LoginRequiredMixin,  DeleteView):
     success_url = reverse_lazy('mailing:messages')
 
     def get_object(self, queryset=None):
+        """Разрешаем удаление сообщения только пользователю, его создавшему"""
         self.object = super().get_object()
-        if self.object.owner == self.request.user or self.request.user.is_superuser:
+        if self.object.owner == self.request.user:
             return self.object
         else:
             raise Http404
@@ -194,16 +224,22 @@ class MessageListView (ListView):
 
 class MailingLogListView(ListView):
     model = MailingLog
+    extra_context = {'title': 'Статистика рассылок'}
 
     def get_queryset(self):
-        queryset = super().get_queryset().all()
-        if not self.request.user.is_staff:
-            queryset = queryset.filter(owner=self.request.user)
-        return queryset
+        """ Для модератора, суперпользователя показываем список всех логов,
+        для обычных пользователей получаем список созданных им рассылок, иначе пустой список"""
+        user_groups = [group.name for group in self.request.user.groups.all()]
+        if self.request.user.is_superuser or 'moderator' in user_groups:
+            return super().get_queryset().all()
+        if self.request.user.is_authenticated:
+            return super().get_queryset().all()
+        return self.model.objects.none()
 
 
 @login_required
 def start_mailing(request, pk):
+    """ Переключение статуса рассылки в ручном режиме только для владельца рассылки"""
     mailing_item = get_object_or_404(Mailing, pk=pk)
     if request.user == mailing_item.owner:
         if mailing_item.is_active:
@@ -219,6 +255,7 @@ def start_mailing(request, pk):
 
 @login_required
 def deactivate_mailing(request, pk):
+    """ Активация/деактивация рассылки для модератора или суперпользователя"""
     mailing_item = get_object_or_404(Mailing, pk=pk)
     user_groups = [group.name for group in request.user.groups.all()]
     if request.user.is_superuser or 'moderator' in user_groups:

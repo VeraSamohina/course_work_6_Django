@@ -24,6 +24,7 @@ class RegisterView(CreateView):
     template_name = 'users/register.html'
 
     def form_valid(self, form):
+        """Отправка подтверждающего письма на электронную почту для верификации"""
         self.object = form.save()
         text_message = ("Вы успешно зарегистрировались на сайте email-рассылок 'Пульс'. "
                         "Для подтверждения электронной почты перейдите пожалуйста по ссылке")
@@ -43,6 +44,7 @@ class VerificationEmailView(TemplateView):
     template_name = 'users/verification.html'
 
     def get(self, request, *args, **kwargs):
+        """Изменение поля на is_verified на True при успешном прохождении верификации"""
         pk = kwargs['pk']
         user = User.objects.get(pk=pk)
         user.is_verified = True
@@ -56,6 +58,7 @@ class UserUpdateView(UpdateView):
     success_url = reverse_lazy('mailing:index')
 
     def get_object(self, queryset=None):
+        """Получение объекта для редактрования"""
         return self.request.user
 
 
@@ -65,13 +68,15 @@ class UserListView(PermissionRequiredMixin, ListView):
     permission_required = []
 
     def has_permission(self):
+        """Вывод списка пользователей для Модератора"""
         if self.request.user.groups.filter(name='moderator').exists():
             return super().has_permission()
 
 
 def toggle_users_status(request, pk):
+    """Блокировка/разблокировка пользователей модератором"""
     user_groups = [group.name for group in request.user.groups.all()]
-    if request.user.is_superuser or 'moderator' in user_groups:
+    if 'moderator' in user_groups:
         user = User.objects.get(pk=pk)
         if user.is_active:
             user.is_active = False
