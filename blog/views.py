@@ -5,13 +5,7 @@ from blog.models import Article
 
 class ArticleListView(ListView):
     model = Article
-
-    def get_context_data(self, **kwargs):
-        context = {
-            'object_list': Article.objects.all(),
-            'title': 'БЛОГ'
-        }
-        return context
+    extra_context = {'title': 'БЛОГ'}
 
 
 class ArticleDetailView(DetailView):

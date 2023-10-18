@@ -222,19 +222,17 @@ class MessageListView (ListView):
         return self.model.objects.none()
 
 
-class MailingLogListView(ListView):
+class MailingLogListView(LoginRequiredMixin, ListView):
     model = MailingLog
     extra_context = {'title': 'Статистика рассылок'}
 
     def get_queryset(self):
-        """ Для модератора, суперпользователя показываем список всех логов,
-        для обычных пользователей получаем список созданных им рассылок, иначе пустой список"""
-        user_groups = [group.name for group in self.request.user.groups.all()]
-        if self.request.user.is_superuser or 'moderator' in user_groups:
-            return super().get_queryset().all()
-        if self.request.user.is_authenticated:
-            return super().get_queryset().all()
-        return self.model.objects.none()
+        """ Для суперпользователя показываем список всех логов,
+                для обычных пользователей получаем список их логов"""
+        if self.request.user.is_superuser:
+            return self.model.objects.all()
+        else:
+            return self.model.objects.filter(user=self.request.user)
 
 
 @login_required
