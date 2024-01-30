@@ -1,0 +1,44 @@
+{% extends 'mailing/base.html' %}
+{% load mytags %}
+{% block content %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-purple mb-3">
+            <div class="card-header text-center">Пользователи</div>
+                <div class="card-body">
+                    <table class ="table table-stripped table-hover">
+                        <thead>
+                        <tr>
+                        <th>#</th>
+                        <th>ФИО</th>
+                        <th>email</th>
+                        <th>Статус</th>
+                        </tr>
+                        </thead>
+                     {% for object in object_list %}
+                        {% if not object.is_superuser %}
+                        <tbody>
+                        <tr>
+                        <th scope="row">{{object.pk}}</th>
+                        <td>{{object.fullname | default:"не указано"}}</td>
+                        <td>{{object.email}}</td>
+                        <td>
+                        {% if request.user|has_group:'moderator' %}
+                        {% if object.is_active %}
+                        <a class="btn btn-warning" href="{% url 'users:toggle_users_status' object.pk %}">Заблокировать пользователя</a>
+                        {% else %}
+                        <a class="btn btn-success" href="{% url 'users:toggle_users_status' object.pk %}">Разблокировать пользователя</a>
+                        {% endif %}
+                        {% endif %}</td>
+                        </tr>
+                        </tbody>
+                        {% endif %}
+                         {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row text-start">
+        <div class="col-lg-9 col-md-6 col-sm-12">
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <div class="card-title">{{ object.title }}</div>
+                </div>
+                <div class="card-body">
+                    <p>
+                        {{ object.content }}
+                    </p>
+                    </div>
+                    <p><small>Дата публикации: {{ object.creation_date }}</small></p>
+                    <div class="card-footer">
+                    <p>Количество просмотров: {{ object.views_count }}</p>
+                        </div>
+
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="card mb-4 box-shadow">
+                {% if object.preview %}
+                <img src="/media/{{ object.preview }}">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

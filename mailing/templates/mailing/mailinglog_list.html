@@ -1,0 +1,30 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+        <table class ="table table-stripped table-hover">
+    <thead>
+      <tr>
+        <th>Дата и время</th>
+        <th>Статус</th>
+        <th>Ответ сервера</th>
+          <th>Рассылка</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for object in object_list %}
+        <tr>
+          <td>{{ object.timestamp }}</td>
+          <td>{{ object.status }}</td>
+          <td>{{ object.response }}</td>
+            <td>{{ object.mailing}} </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="3">Нет данных о доставке</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

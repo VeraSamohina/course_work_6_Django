@@ -1,12 +1,20 @@
 {% extends 'mailing/base.html' %}
+{% load mytags %}
 {% block content %}
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            <div class="card border-purple mb-3">
                 <div class="card-header text-center">
-                   Получатели рассылок для ...
+                    {% if user.is_superuser or request.user|has_group:'moderator' %}
+                    Получатели рассылок
+                    {% elif user.is_authenticated %}
+                    Получатели рассылок пользователя {{user}}
+                    {% else %}
+                    <div class="text-danger">
+                        Чтобы увидеть или добавить получателей рассылок авторизуйтесь</div>
+                    {% endif %}
                 </div>
-                <div class="card-body">
+                <div class="card-body ">
                     <table class ="table table-stripped table-hover">
                         <thead>
                         <tr>
@@ -15,31 +23,38 @@
                         <th>email</th>
                         <th>Дата рождения</th>
                         <th>Комментарий</th>
-                        <th>--</th>
-                        <th></th>
+                            {% if user.is_superuser or request.user|has_group:'moderator' %}
+                            <th>Пользователь</th>
+                            {% endif %}
+                            <th>--</th>
+
                         </tr>
                         </thead>
                         {% for object in object_list %}
                         <tbody>
                         <tr>
                         <th scope="row">{{object.pk}}</th>
-                        <td>{{object.fullname}}</td>
+                        <td>{{object.fullname | default:"не указана"}}</td>
                         <td>{{object.email}}</td>
-                         <td> {% if object.birth_day %} {{ object.birth_day }} {% else %} Не указано {% endif %}</td>
+                         <td> {{ object.birth_day | default:"не указан"}} </td>
                         <td>{{object.comments}}</td>
+                        {% if user.is_superuser or request.user|has_group:'moderator' %}
+                            <td>{{object.owner}}</td>
+                            {% endif %}
+                            {% if object.owner == request.user %}
                         <td><p><a href="{% url 'mailing:edit_client' object.slug %}"><i class="fa-solid fa-pen"></i></a></p> </td>
-                        <td><a href="{% url 'mailing:delete_client' object.slug %}">
+                            {% endif %}
+                            {% if user.is_superuser or object.owner == request.user %}
+                            <td><a href="{% url 'mailing:delete_client' object.slug %}">
                             <i class="fa-solid fa-trash" style="color: #dc3545"></i>
                         </a></td>
+                        {% endif %}
                         </tbody>
                         {% endfor %}
-
-
-
                     </table>
-
-                        <a href="{% url 'mailing:create_client' %}" class="btn btn-outline-primary w-100">Добавить получателя</a>
-
+                     {% if not request.user|has_group:'moderator' %}
+                        <a href="{% url 'mailing:create_client' %}" class="btn btn-outline-orange w-100">Добавить получателя</a>
+                {% endif %}
                 </div>
             </div>
         </div>

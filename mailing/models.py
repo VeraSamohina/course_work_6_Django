@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from pytils.translit import slugify
 
@@ -10,6 +11,8 @@ class Client(models.Model):
     comments = models.TextField(verbose_name='комментарии', **NULLABLE)
     birth_day = models.DateField(verbose_name='дата рождения', **NULLABLE)
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, **NULLABLE,
+                              verbose_name='пользователь')
 
     def __str__(self):
         return f'{self.fullname} ({self.email})'
@@ -31,6 +34,8 @@ class Message(models.Model):
     title = models.CharField(max_length=150, verbose_name='название')
     body = models.TextField(verbose_name='текст рассылки')
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, **NULLABLE,
+                              verbose_name='пользователь')
 
     def __str__(self):
         return self.title
@@ -49,7 +54,7 @@ class Message(models.Model):
 
 
 class Mailing(models.Model):
-    STATUS_CHOICES = [('created', 'created'), ('active', 'active'), ('completed', 'completed')]
+    STATUS_CHOICES = [('created', 'created'), ('started', 'started'), ('completed', 'completed')]
     PERIOD_CHOICES = [('one_time', 'one_time'), ('daily', 'daily'), ('weekly', 'weekly'),
                       ('monthly', 'monthly')]
     start_time = models.DateTimeField(verbose_name='начало рассылки', **NULLABLE)
@@ -60,6 +65,9 @@ class Mailing(models.Model):
     message = models.ForeignKey(Message, on_delete=models.SET_NULL, verbose_name='текст рассылки', **NULLABLE)
     clients = models.ManyToManyField(Client, verbose_name='клиенты')
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
+    is_active = models.BooleanField(default=True, verbose_name='активна')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, **NULLABLE,
+                              verbose_name='пользователь')
 
     def __str__(self):
         return self.title
@@ -77,8 +85,9 @@ class Mailing(models.Model):
         verbose_name_plural = 'рассылки'
 
 
-class Log(models.Model):
+class MailingLog(models.Model):
     mailing = models.ForeignKey(Mailing, on_delete=models.CASCADE, verbose_name='рассылка')
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name='время')
     status = models.CharField(max_length=20, verbose_name='статус')
     response = models.TextField(blank=True, verbose_name='ответ сервера')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='пользователь', **NULLABLE)
